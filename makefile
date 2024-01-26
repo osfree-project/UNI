@@ -16,6 +16,8 @@ OS2TKINC = $(%ROOT)build$(SEP)bin$(SEP)os2tk45$(SEP)inc$(SEP)
 SRC = $(MYDIR)..$(SEP)..$(SEP)..$(SEP)UNI$(SEP)
 !endif
 
+DIRS = tools
+
 !include $(%ROOT)tools/mk/all.mk
 
 OUT = $(%ROOT)build$(SEP)include$(SEP)
