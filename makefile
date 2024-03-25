@@ -8,7 +8,7 @@
 # 1. UniAPI must come first here because used to produce API headers
 
 # Note II: Do not list 'scripts' dir here, in this case you'll encounter the dead loop
-DIRS = uni2h UNI
+DIRS = uni2h UNI target
 PLATFORM = host$(SEP)$(%HOST)$(SEP)
 
 !include $(%ROOT)tools/mk/all.mk

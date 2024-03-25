@@ -45,6 +45,7 @@ workaround: $(SRC)cdeftypes2.h $(SRC)dosfilemgrcommon.h $(SRC)exe386.h $(SRC)new
 
 ## OS/2 Personality INC files
 os2inc: $(OS2TKINC)os2.inc &
+	$(OS2TKINC)basemid.inc &
 	$(OS2TKINC)bseerr.inc &
 	$(OS2TKINC)bsedos.inc &
 	$(OS2TKINC)bsesub.inc &
@@ -526,10 +527,6 @@ $(OS2TKINC)os2.inc: $(SRC)inc$(SEP)os2.inc
 	$(verbose)$(SAY) CP       $^. $(LOG)
 	$(verbose)$(CP) $< $^@ $(BLACKHOLE)
 
-$(OS2TKINC)bseerr.inc: $(SRC)inc$(SEP)bseerr.inc
-	$(verbose)$(SAY) CP       $^. $(LOG)
-	$(verbose)$(CP) $< $^@ $(BLACKHOLE)
-
 $(OS2TKINC)bsedos.inc: $(SRC)inc$(SEP)bsedos.inc
 	$(verbose)$(SAY) CP       $^. $(LOG)
 	$(verbose)$(CP) $< $^@ $(BLACKHOLE)
@@ -546,6 +543,10 @@ $(OS2TKINC)mac.inc: $(SRC)inc$(SEP)mac.inc
 	$(verbose)$(SAY) CP       $^. $(LOG)
 	$(verbose)$(CP) $< $^@ $(BLACKHOLE)
 
+#$(OS2TKINC)basemid.inc: $(SRC)os2$(SEP)cpi$(SEP)basemid.uni
+
+#$(OS2TKINC)bseerr.inc: $(SRC)os2$(SEP)cpi$(SEP)bseerr.uni
+
 ## POSIX API
 
 $(OS2TKH)stddef.h: $(SRC)os2$(SEP)stddef.uni
@@ -561,7 +562,7 @@ $(OUT)dos$(SEP)dos.h: $(SRC)dos$(SEP)dos.uni
 $(OUT)dos$(SEP)os2vdm.h: $(SRC)dos$(SEP)os2vdm.uni
 
 .SUFFIXES:
-.SUFFIXES: .lib .h .uni
+.SUFFIXES: .lib .h .inc .uni
 
 .uni: $(SRC)shared
 .uni: $(SRC)shared$(SEP)utlapi
@@ -575,10 +576,14 @@ $(OUT)dos$(SEP)os2vdm.h: $(SRC)dos$(SEP)os2vdm.uni
 .lib: $(PATH)
 
 .uni.h: .AUTODEPEND
- @$(SAY) UNI2H    $^. $(LOG)
+ @$(SAY) UNI2INC    $^. $(LOG)
  $(verbose)uni2h.exe -e h -a $(SRC)os2$(SEP)os2386.abi $< $^@ $(LOG2)
 
+.uni.inc: .AUTODEPEND
+ @$(SAY) UNI2H    $^. $(LOG)
+ $(verbose)uni2h.exe -e inc -a $(SRC)os2$(SEP)os2386.abi $< $^@ $(LOG2)
+
 .uni.lib: .AUTODEPEND
- @$(SAY) LIB      $^. $(LOG)
+ @$(SAY) UNI2DEF      $^. $(LOG)
  $(verbose)uni2h.exe -e def -a $(SRC)os2$(SEP)os2386.abi $< $^*.def $(LOG2)
 # $(verbose)$(LIB) $(LIBOPT) $^@ @$^*.def

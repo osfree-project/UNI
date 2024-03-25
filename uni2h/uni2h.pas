@@ -1,7 +1,7 @@
 Program UNI2H;
 
 uses
-  abi, defwrite, hwrite, pparser, pastree, sysutils, classes, getopts;
+  abi, defwrite, hwrite, incwrite, pparser, pastree, sysutils, classes, getopts;
 
 Type
   TUNIAPIEngine = class(TPasTreeContainer)
@@ -117,6 +117,7 @@ begin
     AModule:=ParseSource(AEngine, unifile,'','');
     if emitter='def' then WriteDefFile(AModule, outfile) 
     else if emitter='h' then WriteHFile(AModule, outfile) 
+    else if emitter='inc' then WriteIncFile(AModule, outfile) 
     else WriteHFile(AModule, outfile);
   end else Writeln('error');
 end.
