@@ -8,5 +8,6 @@ constant EAT_APPTYP_EXETYPE    =  $03;            (* EXE type mask *)
 (* constant EAT_APPTYP_RESERVED  =   not EAT_APPTYP_EXETYPE; *)
 
 uses dosfilemgrcommon default;
+uses dosfmsmcommon default;
 
 end.

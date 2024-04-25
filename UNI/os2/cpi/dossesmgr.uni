@@ -94,4 +94,6 @@ function  DosStopSession(in scope: ULONG;
 function DosQueryAppType(in  pszName: PCSZ;
                          out pFlags: ULONG): APIRET;
 
+uses dosfmsmcommon default;
+
 end.

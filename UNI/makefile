@@ -87,6 +87,7 @@ os2: $(OS2TKH)os2.h &
      $(OS2TKH)dosmodulemgr.h &
      $(OS2TKH)dossesmgr.h &
      $(OS2TKH)dosfilemgr.h &
+     $(OS2TKH)dosfmsmcommon.h &
 #     $(OS2TKH)dosfilemgrcommon.h &
      $(OS2TKH)dosmemmgr.h &
      $(OS2TKH)dosmemmgrcommon.h &

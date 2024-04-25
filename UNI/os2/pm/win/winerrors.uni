@@ -1,6 +1,6 @@
 group winerrors;
 
-uses pmerr;
+uses pmerr default;
 
 
    (* Error codes for debugging support                                       *)

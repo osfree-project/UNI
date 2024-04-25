@@ -507,6 +507,18 @@ type QSPTRREC=structure
         pFSRec: PQSFREC;        (* ptr to head of file sys records *)
 end;
 
+type CPUUTIL=structure
+    ulTimeLow: ULONG;
+    ulTimeHigh: ULONG;
+    ulIdleLow: ULONG;
+    ulIdleHigh: ULONG;
+    ulBusyLow: ULONG;
+    ulBusyHigh: ULONG;
+    ulIntrLow: ULONG;
+    ulIntrHigh: ULONG;
+end;
+type PCPUUTIL=^CPUUTIL;
+
 function DosQuerySysState(in EntityList: ULONG;
                           in EntityLevel: ULONG;
                           in pid: PID;

@@ -1,6 +1,6 @@
 group pmwp;
 
-uses pmerr;
+uses pmerr default;
 
 type HOBJECT=LHANDLE;
 
