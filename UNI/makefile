@@ -51,6 +51,10 @@ os2inc: $(OS2TKINC)os2.inc &
 	$(OS2TKINC)bsesub.inc &
 	$(OS2TKINC)sas.inc &
 	$(OS2TKINC)mac.inc &
+	$(OS2TKINC)sub.inc &
+	$(OS2TKINC)kbd.inc &
+	$(OS2TKINC)mou.inc &
+	$(OS2TKINC)vio.inc &
 	.symbolic
 
 ## OS/2 Personality H files

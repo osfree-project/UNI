@@ -158,30 +158,32 @@ end;
 
 procedure TIncWriter.WriteType(AType: TPasType; ATypeDecl: boolean);
 begin
-  if ATypeDecl then wrt('typedef ');
   if AType.ClassType = TPasUnresolvedTypeRef then
     wrt(ConvertToCType(AType.Name))
   else if AType.ClassType = TPasClassType then
     WriteClass(TPasClassType(AType))
   else if AType.ClassType = TPasPointerType then
   begin
+    wrt(ConvertToCType(TPasAliasType(AType).Name));
+
+    if ATypeDecl then wrt(' TYPEDEF ');
+
     if Assigned(TPasPointerType(AType).DestType) then
     begin
-      if ATypeDecl then wrt(ConvertToCType(TPasPointerType(AType).DestType.Name)+' * ');
+      if ATypeDecl then wrt('PTR '+ConvertToCType(TPasPointerType(AType).DestType.Name));
     end else begin
-      if ATypeDecl then wrt('void * ');
+      if ATypeDecl then wrt('PTR ');
     end;
-    wrt(ConvertToCType(TPasAliasType(AType).Name));
+
     if (not ATypeDecl) and (TPasAliasType(AType).Name='') and Assigned(TPasPointerType(AType).DestType) then
 	begin
-	  wrt(ConvertToCType(TPasPointerType(AType).DestType.Name)+' * ');
+	  wrt(ConvertToCType(TPasPointerType(AType).DestType.Name)+'PTR ');
 	end;
-    if ATypeDecl then wrtln(';');
+    if ATypeDecl then wrtln('');
   end else if AType.ClassType = TPasAliasType then
   begin
-    if ATypeDecl then Wrt(ConvertToCType(TPasAliasType(AType).DestType.Name)+' ');
     wrt(ConvertToCType(TPasAliasType(AType).Name));
-    if ATypeDecl then WrtLn(';');
+    if ATypeDecl then WrtLn(' TYPEDEF '+ConvertToCType(TPasAliasType(AType).DestType.Name));
   end else if AType.ClassType = TPasRecordType then
   begin
     if aTypeDecl then
@@ -219,6 +221,21 @@ begin
   WrtLn;
   WrtLn( '		ifndef __'+Upcase(AModule.Name)+'_INC__');
   WrtLn( '__'+Upcase(AModule.Name)+'_INC__	EQU	1');
+  WrtLn( '		ifndef APIENTRY');
+  WrtLn( 'APIENTRY	EQU	C');
+  WrtLn( '		endif');
+  WrtLn( '		ifndef USHORT');
+  WrtLn( 'USHORT	TYPEDEF	WORD');
+  WrtLn( '		endif');
+  WrtLn( '		ifndef UCHAR');
+  WrtLn( 'UCHAR		TYPEDEF	BYTE');
+  WrtLn( '		endif');
+  WrtLn( '		ifndef CHAR');
+  WrtLn( 'CHAR		TYPEDEF	BYTE');
+  WrtLn( '		endif');
+  WrtLn( '		ifndef ULONG');
+  WrtLn( 'ULONG		TYPEDEF	DWORD');
+  WrtLn( '		endif');
 {$ifdef 0}
   WrtLn;
   WrtLn( '#ifndef NULL');
@@ -241,9 +258,6 @@ begin
   WrtLn( '#define EXPENTRY  _System');
   WrtLn( '#endif');
   WrtLn;
-  WrtLn( '#ifndef APIENTRY');
-  WrtLn( '#define APIENTRY  _System');
-  WrtLn( '#endif');
   WrtLn;
   WrtLn( '#ifndef FAR');
   WrtLn( '#define FAR');
@@ -390,7 +404,7 @@ begin
   While pos('$', S)>0 do
   begin
     p:=pos('$', S);
-    S:=Copy(S, 1, p-1)+'0x'+Copy(S, p+1, Length(S)-p);
+    S:=Copy(S, 1, p-1)+'0'+Copy(S, p+1, Length(S)-p)+'H';
   end;
 
   While pos(' or ', S)>0 do
@@ -432,6 +446,7 @@ var
   i: Integer;
   ABI: TABI;
 begin
+{
   if Assigned(AProc.ProcType) and
     (AProc.ProcType.ClassType = TPasFunctionType) then
   begin
@@ -439,42 +454,40 @@ begin
   end else begin
     wrt('VOID');
   end;
+}
 
   ABI:=AbiGet(AProc.Name);
   If ABI.Name='' then raise Exception.Create('ABI not found for '+AProc.Name);
-  wrt(' '+ABI.CallingConvertion+' '+AProc.Name);
+  wrt(AProc.Name+' PROTO '+ABI.CallingConvertion+' ');
 
   if Assigned(AProc.ProcType) and (AProc.ProcType.Args.Count > 0) then
   begin
-    wrt('(');
     for i := 0 to AProc.ProcType.Args.Count - 1 do
       with TPasArgument(AProc.ProcType.Args[i]) do
       begin
         if i > 0 then
           wrt(', ');
+
+        wrt(Name+':');
         case Access of
-          argIn:    wrt('const ');
+          argIn:    wrt('');
           argInOut: wrt('');
           argOut:   wrt('');
         end;
         if Assigned(ArgType) then
         begin
           WriteType(ArgType, false);
-          wrt(' ');
+//          wrt(' ');
         end;
         case Access of
           argIn:    wrt('');
           argInOut: wrt('* ');
           argOut:   wrt('* ');
         end;
-        wrt(Name);
       end;
-    wrt(')');
-  end else begin
-    wrt('(VOID)');
+//  end else begin
+//    wrt('(VOID)');
   end;
-
-  wrt(';');
 
   wrtln;
 end;
@@ -656,10 +669,12 @@ procedure TIncWriter.WriteRecordType(AElement: TPasRecordType; NestingLevel: Int
 var
   i: Integer;
   Variable: TPasVariable;
+  Typ: TPasType;
 begin
-  if not (AElement.Parent is TPasVariant) then wrt('struct ');
 
-  wrtln('_'+AElement.Name+' {');
+  wrt(AElement.Name);
+
+  if not (AElement.Parent is TPasVariant) then wrtln(' STRUC');
 
   for i := 0 to AElement.Members.Count - 1 do
   begin
@@ -669,15 +684,18 @@ begin
     begin
       wrtln(ConvertToCType(TPasArrayType(Variable.VarType).ElType.Name)+' '+Variable.Name+'[' + TPasArrayType(Variable.VarType).IndexRange + '];');
     end else begin
-    if Variable.VarType.ClassType = TPasPointerType then
+      if Variable.VarType.ClassType = TPasPointerType then
 	  if (AElement.Name=TPasPointerType(Variable.VarType).DestType.Name) then wrt('struct ');
 	  
-      WriteType(TPasType(Variable.VarType), false);
-      wrtln(' '+Variable.Name+';'); //{'+Variable.VarType.ClassName+'}
+//      WriteType(TPasType(Variable.VarType), false);
+      wrt(Variable.Name+' '); //{'+Variable.VarType.ClassName+'}
 
+      wrt(ConvertToCType(Variable.VarType.Name));
+      
+      wrtln(' ?');
     end;
   end;
-  wrtln('} '+AElement.Name+';');
+  wrtln(AElement.Name+' ENDS');
 end;
 
 procedure WriteIncFile(AElement: TPasElement; const AFilename: string);

@@ -1,22 +1,28 @@
-;/*!
-;   @file
+;*****************************************************************************
+;    os2.inc
+;    (C) 2004-2024 osFree project
 ;
-;   @ingroup fapi
-;
-;   @brief Family API implementation
-;
-;   (c) osFree Project 2018-2022, <http://www.osFree.org>
-;   for licence see licence.txt in root directory, or project website
-;
-;   This is Family API implementation for DOS, used with BIND tools
-;   to link required API
-;
-;   @author Yuri Prokushev (yuri.prokushev@gmail.com)
-;
-;*/
+;    WARNING! Automaticaly generated file! Don't edit it manually!
+;*****************************************************************************
 
-OS2_INCLUDED   equ 1
+		ifndef __OS2_INC__
+__OS2_INC__	EQU	1
 
-include os2def.inc
-include bse.inc
-; include pm.inc
+INCL_OS2DEF	EQU	1
+	ifdef INCL_OS2DEF
+  	include os2def.inc
+	endif
+
+INCL_BSE	EQU	1
+	ifdef INCL_BSE
+  	include bse.inc
+	endif
+
+INCL_PM	EQU	1
+	ifdef INCL_PM
+  	include pm.inc
+	endif
+
+
+
+	endif	; __OS2_INC__
