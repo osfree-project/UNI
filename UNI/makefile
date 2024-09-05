@@ -51,10 +51,10 @@ os2inc: $(OS2TKINC)os2.inc &
 	$(OS2TKINC)bsesub.inc &
 	$(OS2TKINC)sas.inc &
 	$(OS2TKINC)mac.inc &
-	$(OS2TKINC)sub.inc &
-	$(OS2TKINC)kbd.inc &
-	$(OS2TKINC)mou.inc &
-	$(OS2TKINC)vio.inc &
+#	$(OS2TKINC)sub.inc &
+#	$(OS2TKINC)kbd.inc &
+#	$(OS2TKINC)mou.inc &
+#	$(OS2TKINC)vio.inc &
 	.symbolic
 
 ## OS/2 Personality H files
@@ -251,6 +251,15 @@ $(OS2TKINC)mac.inc: $(SRC)inc$(SEP)mac.inc
 	$(verbose)$(SAY) CP       $^. $(LOG)
 	$(verbose)$(CP) $< $^@ $(BLACKHOLE)
 
+$(OS2TKINC)bseerr.inc: $(SRC)inc$(SEP)bseerr.inc
+	$(verbose)$(SAY) CP       $^. $(LOG)
+	$(verbose)$(CP) $< $^@ $(BLACKHOLE)
+
+$(OS2TKINC)basemid.inc: $(SRC)inc$(SEP)basemid.inc
+	$(verbose)$(SAY) CP       $^. $(LOG)
+	$(verbose)$(CP) $< $^@ $(BLACKHOLE)
+
+
 ## POSIX API
 
 $(OS2TKH)stddef.h: $(SRC)os2$(SEP)stddef.uni
@@ -283,9 +292,9 @@ $(OUT)dos$(SEP)os2vdm.h: $(SRC)dos$(SEP)os2vdm.uni
  @$(SAY) UNI2H    $^. $(LOG)
  $(verbose)uni2h.exe -e h -a $(SRC)os2$(SEP)os2386.abi $< $^@ $(LOG2)
 
-.uni.inc: .AUTODEPEND
- @$(SAY) UNI2INC  $^. $(LOG)
- $(verbose)uni2h.exe -e inc -a $(SRC)os2$(SEP)os2386.abi $< $^@ $(LOG2)
+#.uni.inc: .AUTODEPEND
+# @$(SAY) UNI2INC  $^. $(LOG)
+# $(verbose)uni2h.exe -e inc -a $(SRC)os2$(SEP)os2386.abi $< $^@ $(LOG2)
 
 .uni.lib: .AUTODEPEND
  @$(SAY) UNI2DEF  $^. $(LOG)
