@@ -157,7 +157,16 @@ begin
 end;
 
 procedure THWriter.WriteType(AType: TPasType; ATypeDecl: boolean);
+var
+ ABI: TABI;
 begin
+  if ATypeDecl then 
+    if (AType.ClassType = TPasRecordType) and not (TPasRecordType(AType).Parent is TPasVariant) then 
+    begin
+      ABI:=AbiGet(AType.Name);
+      if ABI.Name='' then raise Exception.Create('No ABI found for '+AType.Name);
+      wrtln('#pragma pack(push, '+ABI.Pack+')');
+    end;
   if ATypeDecl then wrt('typedef ');
   if AType.ClassType = TPasUnresolvedTypeRef then
     wrt(ConvertToCType(AType.Name))
@@ -662,8 +671,15 @@ procedure THWriter.WriteRecordType(AElement: TPasRecordType; NestingLevel: Integ
 var
   i: Integer;
   Variable: TPasVariable;
+  ABI: TABI;
 begin
-  if not (AElement.Parent is TPasVariant) then wrt('struct ');
+  if not (AElement.Parent is TPasVariant) then 
+  begin
+//    ABI:=AbiGet(AElement.Name);
+//    if ABI.Name='' then raise Exception.Create('No ABI found for '+AElement.Name);
+//    wrtln('#pragma pack(push, '+ABI.Pack+')');
+    wrt('struct ');
+  end;
 
   wrtln('_'+AElement.Name+' {');
 
@@ -684,6 +700,7 @@ begin
     end;
   end;
   wrtln('} '+AElement.Name+';');
+  wrtln('#pragma pack(pop)');
 end;
 
 procedure WriteHFile(AElement: TPasElement; const AFilename: string);

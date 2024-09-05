@@ -17,6 +17,7 @@ type
     AbiStructDef:
     (
 	  Prefix: ShortString;
+	  Pack: ShortString;
     );
     AbiTypeDef:
     (
@@ -100,6 +101,8 @@ begin
     if T='STRUCT' then
     begin
       Result.AbiType:=AbiStructDef;
+      Result.Pack:=Copy(S, 1, Pos(' ', S)-1);
+      Delete(S, 1, Pos(' ', S));
       Result.Prefix:=S;
     end else
     if T='TYPE' then

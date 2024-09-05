@@ -227,6 +227,9 @@ begin
   WrtLn( '		ifndef USHORT');
   WrtLn( 'USHORT	TYPEDEF	WORD');
   WrtLn( '		endif');
+  WrtLn( '		ifndef SHORT');
+  WrtLn( 'SHORT	TYPEDEF	WORD');
+  WrtLn( '		endif');
   WrtLn( '		ifndef UCHAR');
   WrtLn( 'UCHAR		TYPEDEF	BYTE');
   WrtLn( '		endif');
@@ -469,7 +472,9 @@ begin
           wrt(', ');
 
 		// @todo: add all MASM keywords
-		if UpCase(Name)='FWAIT' then wrt('_');
+		if (UpCase(Name)='FWAIT') or
+		   (UpCase(Name)='STR') or
+		   (UpCase(Name)='CX') then wrt('_');
 
         wrt(Name+':');
         case Access of
@@ -682,7 +687,7 @@ begin
     If ABI.Name<>'' then 
 	begin
       Prefix:=ABI.Prefix+'_';
-	end;
+	end else raise Exception.Create('No ABI found for '+AElement.Name);
   end;
 
   for i := 0 to AElement.Members.Count - 1 do
