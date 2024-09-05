@@ -142,7 +142,7 @@ begin
       AElement.ElementTypeName + ' nodes');
 end;
 
-function ConvertToCType(S: String): String;
+function ConvertToASMType(S: String): String;
 begin
   Result:=S;
   if S='pointer' then Result:='void *' else // How to correctly handle this?
@@ -152,38 +152,38 @@ begin
   if S='T_WORD' then Result:='unsigned short' else
   if S='T_DWORD' then Result:='unsigned long' else
   if S='T_INT16' then Result:='short' else
-  if S='T_INT32' then Result:='long';
+  if S='T_INT32' then Result:='long' else
   if S='T_UINT' then Result:='unsigned int';
 end;
 
 procedure TIncWriter.WriteType(AType: TPasType; ATypeDecl: boolean);
 begin
   if AType.ClassType = TPasUnresolvedTypeRef then
-    wrt(ConvertToCType(AType.Name))
+    wrt(ConvertToASMType(AType.Name))
   else if AType.ClassType = TPasClassType then
     WriteClass(TPasClassType(AType))
   else if AType.ClassType = TPasPointerType then
   begin
-    wrt(ConvertToCType(TPasAliasType(AType).Name));
+    wrt(ConvertToASMType(TPasAliasType(AType).Name));
 
     if ATypeDecl then wrt(' TYPEDEF ');
 
     if Assigned(TPasPointerType(AType).DestType) then
     begin
-      if ATypeDecl then wrt('PTR '+ConvertToCType(TPasPointerType(AType).DestType.Name));
+      if ATypeDecl then wrt('PTR '+ConvertToASMType(TPasPointerType(AType).DestType.Name));
     end else begin
       if ATypeDecl then wrt('PTR ');
     end;
 
     if (not ATypeDecl) and (TPasAliasType(AType).Name='') and Assigned(TPasPointerType(AType).DestType) then
 	begin
-	  wrt(ConvertToCType(TPasPointerType(AType).DestType.Name)+'PTR ');
+	  wrt(' PTR '+ConvertToASMType(TPasPointerType(AType).DestType.Name));
 	end;
     if ATypeDecl then wrtln('');
   end else if AType.ClassType = TPasAliasType then
   begin
-    wrt(ConvertToCType(TPasAliasType(AType).Name));
-    if ATypeDecl then WrtLn(' TYPEDEF '+ConvertToCType(TPasAliasType(AType).DestType.Name));
+    wrt(ConvertToASMType(TPasAliasType(AType).Name));
+    if ATypeDecl then WrtLn(' TYPEDEF '+ConvertToASMType(TPasAliasType(AType).DestType.Name));
   end else if AType.ClassType = TPasRecordType then
   begin
     if aTypeDecl then
@@ -193,7 +193,7 @@ begin
   end else if AType.ClassType = TPasArrayType then
   begin
     if ATypeDecl then
-      wrt(ConvertToCType(TPasArrayType(AType).ElType.Name)+' '+TPasAliasType(AType).Name+'[' + TPasArrayType(AType).IndexRange + ']')
+      wrt(ConvertToASMType(TPasArrayType(AType).ElType.Name)+' '+TPasAliasType(AType).Name+'[' + TPasArrayType(AType).IndexRange + ']')
     else
       wrt(TPasAliasType(AType).Name);
 
@@ -468,21 +468,19 @@ begin
         if i > 0 then
           wrt(', ');
 
+		// @todo: add all MASM keywords
+		if UpCase(Name)='FWAIT' then wrt('_');
+
         wrt(Name+':');
         case Access of
           argIn:    wrt('');
-          argInOut: wrt('');
-          argOut:   wrt('');
+          argInOut: wrt(' PTR ');
+          argOut:   wrt(' PTR ');
         end;
         if Assigned(ArgType) then
         begin
           WriteType(ArgType, false);
 //          wrt(' ');
-        end;
-        case Access of
-          argIn:    wrt('');
-          argInOut: wrt('* ');
-          argOut:   wrt('* ');
         end;
       end;
 //  end else begin
@@ -510,19 +508,19 @@ begin
         if i > 0 then
           wrt(', ');
         case Access of
-          argIn:    wrt('const ');
+          argIn:    wrt('');
           argInOut: wrt('');
           argOut: wrt('');
+        end;
+        case Access of
+          argIn:    wrt('');
+          argInOut: wrt(' PTR ');
+          argOut:   wrt(' PTR ');
         end;
         if Assigned(ArgType) then
         begin
           WriteType(ArgType, false);
           wrt(' ');
-        end;
-        case Access of
-          argIn:    wrt('');
-          argInOut: wrt('* ');
-          argOut:   wrt('* ');
         end;
         wrt(Name);
       end;
@@ -556,19 +554,19 @@ begin
         if i > 0 then
           wrt(', ');
         case Access of
-          argIn: wrt('const ');
+          argIn: wrt('');
           argInOut: wrt('');
           argOut: wrt('');
+        end;
+        case Access of
+          argIn: wrt('');
+          argInOut: wrt(' PTR ');
+          argOut: wrt(' PTR ');
         end;
         if Assigned(ArgType) then
         begin
           WriteType(ArgType, false);
           wrt(' ');
-        end;
-        case Access of
-          argIn: wrt('');
-          argInOut: wrt('* ');
-          argOut: wrt('* ');
         end;
         wrt(Name);
       end;
@@ -682,7 +680,7 @@ begin
 
     if Variable.VarType.ClassType = TPasArrayType then
     begin
-      wrtln(ConvertToCType(TPasArrayType(Variable.VarType).ElType.Name)+' '+Variable.Name+'[' + TPasArrayType(Variable.VarType).IndexRange + '];');
+      wrtln(ConvertToASMType(TPasArrayType(Variable.VarType).ElType.Name)+' '+Variable.Name+'[' + TPasArrayType(Variable.VarType).IndexRange + '];');
     end else begin
       if Variable.VarType.ClassType = TPasPointerType then
 	  if (AElement.Name=TPasPointerType(Variable.VarType).DestType.Name) then wrt('struct ');
@@ -690,7 +688,7 @@ begin
 //      WriteType(TPasType(Variable.VarType), false);
       wrt(Variable.Name+' '); //{'+Variable.VarType.ClassName+'}
 
-      wrt(ConvertToCType(Variable.VarType.Name));
+      wrt(ConvertToASMType(Variable.VarType.Name));
       
       wrtln(' ?');
     end;
