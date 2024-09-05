@@ -1,3 +1,10 @@
+PTRLOC                                      STRUCT moupl
+PTRSHAPE                                    STRUCT moups
+MOUEVENTINFO                                STRUCT mouev
+MOUQUEINFO                                  STRUCT mouqi
+SCALEFACT                                   STRUCT mousc
+NOPTRRECT                                   STRUCT mourt
+THRESHOLD                                   STRUCT threshold
 _PFN                                        TYPE APIENTRY
 _NPFN                                       TYPE APIENTRY
 _ERR                                        TYPE APIENTRY

@@ -7,13 +7,17 @@ var
   abifile: string;
 
 type
-  TAbiType=(AbiDynamicLibrary, AbiStaticLibrary, AbiInterrupt, AbiTypeDef);
+  TAbiType=(AbiDynamicLibrary, AbiStaticLibrary, AbiInterrupt, AbiTypeDef, AbiStructDef);
 
 type
   TABI=record
     Name: ShortString;
     CallingConvertion: ShortString;
     case AbiType: TAbiType of
+    AbiStructDef:
+    (
+	  Prefix: ShortString;
+    );
     AbiTypeDef:
     (
     );
@@ -92,6 +96,11 @@ begin
         Result.ImportLibrary:=S;
         Result.ImportName:='';
       end;
+    end else
+    if T='STRUCT' then
+    begin
+      Result.AbiType:=AbiStructDef;
+      Result.Prefix:=S;
     end else
     if T='TYPE' then
     begin

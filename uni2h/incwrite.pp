@@ -668,15 +668,26 @@ var
   i: Integer;
   Variable: TPasVariable;
   Typ: TPasType;
+  ABI: TABI;
+  Prefix: ShortString;
 begin
+  Prefix:='';
 
   wrt(AElement.Name);
 
-  if not (AElement.Parent is TPasVariant) then wrtln(' STRUC');
+  if not (AElement.Parent is TPasVariant) then 
+  begin
+    wrtln(' STRUC');
+    ABI:=AbiGet(AElement.Name);
+    If ABI.Name<>'' then 
+	begin
+      Prefix:=ABI.Prefix+'_';
+	end;
+  end;
 
   for i := 0 to AElement.Members.Count - 1 do
   begin
-    Variable := TPasVariable(AElement.Members[i]);
+    Variable:=TPasVariable(AElement.Members[i]);
 
     if Variable.VarType.ClassType = TPasArrayType then
     begin
@@ -686,7 +697,7 @@ begin
 	  if (AElement.Name=TPasPointerType(Variable.VarType).DestType.Name) then wrt('struct ');
 	  
 //      WriteType(TPasType(Variable.VarType), false);
-      wrt(Variable.Name+' '); //{'+Variable.VarType.ClassName+'}
+      wrt(Prefix+Variable.Name+' '); //{'+Variable.VarType.ClassName+'}
 
       wrt(ConvertToASMType(Variable.VarType.Name));
       
