@@ -174,9 +174,18 @@ struct new_exe {
 	};
     unsigned short  ne_enttab;				/* Entry Table file offset, relative to the beginning of
 											   the segmented EXE header */
-    unsigned short  ne_cbenttab;			/* Number of bytes in the entry table */
-    long            ne_crc;					/* 32-bit CRC of entire contents of file.
+	union {
+		unsigned short  ne_cbenttab;		/* Number of bytes in the entry table */
+		unsigned short  next;				/* Selector to next module */
+	};
+	union {
+		long            ne_crc;				/* 32-bit CRC of entire contents of file.
 											   These words are taken as 00 during the calculation */
+		struct {
+			unsigned short	dgroup_entry;	/* Near ptr to segment entry for DGROUP */
+			unsigned short	fileinfo;		/* Near ptr to file info (OFSTRUCT)*/
+		};
+	};
     unsigned short  ne_flags;				/* Flag word */
     unsigned short  ne_autodata;			/* Segment number of automatic data segment.
 											   This value is set to zero if SINGLEDATA and
@@ -228,7 +237,7 @@ struct new_exe {
     unsigned short  ne_cres;				/* Number of resource entries */
     unsigned char   ne_exetyp;				/* Executable type, used by loader.
 											   02h = WINDOWS */
-    unsigned char   ne_flagsothers;			
+    unsigned char   ne_flagsothers;			/* Operating system flags */
     char            ne_res[NERESBYTES];		/* Reserved */ 
 };
 
