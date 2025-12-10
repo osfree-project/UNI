@@ -222,7 +222,7 @@ os2libs: $(LIBOUT)sub32.lib &
 
 $(LIBOUT)sub32.lib: $(SRC)os2$(SEP)vio.uni
  @$(SAY) LIB      $^.
- @uni2h.exe -e def -a $(SRC)os2$(SEP)os2386.abi $< $^*.def
+ @$(%INTERP)uni2h.exe -e def -a $(SRC)os2$(SEP)os2386.abi $< $^*.def
  @$(LIB) $(LIBOPT) $^@ @$^*.def
 # @$(DC) $^*.def $(BLACKHOLE)
 
@@ -290,13 +290,13 @@ $(OUT)dos$(SEP)os2vdm.h: $(SRC)dos$(SEP)os2vdm.uni
 
 .uni.h: .AUTODEPEND
  @$(SAY) UNI2H    $^. $(LOG)
- $(verbose)uni2h.exe -e h -a $(SRC)os2$(SEP)os2386.abi $< $^@ $(LOG2)
+ $(verbose)$(%INTERP)uni2h.exe -e h -a $(SRC)os2$(SEP)os2386.abi $< $^@ $(LOG2)
 
 #.uni.inc: .AUTODEPEND
 # @$(SAY) UNI2INC  $^. $(LOG)
-# $(verbose)uni2h.exe -e inc -a $(SRC)os2$(SEP)os2386.abi $< $^@ $(LOG2)
+# $(verbose)$(%INTERP)uni2h.exe -e inc -a $(SRC)os2$(SEP)os2386.abi $< $^@ $(LOG2)
 
 .uni.lib: .AUTODEPEND
  @$(SAY) UNI2DEF  $^. $(LOG)
- $(verbose)uni2h.exe -e def -a $(SRC)os2$(SEP)os2386.abi $< $^*.def $(LOG2)
+ $(verbose)$(%INTERP)uni2h.exe -e def -a $(SRC)os2$(SEP)os2386.abi $< $^*.def $(LOG2)
 # $(verbose)$(LIB) $(LIBOPT) $^@ @$^*.def
